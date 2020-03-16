@@ -35,44 +35,20 @@ class Tabuleiro extends React.Component {
     super (props);
     this.state = {
       quadrados: Array(9).fill(null),
-      xIsNext: true,
-      gameEnded: false,
+      xIsNext: true
     };
   }
   
   render (){
-    console.log("render state: " + this.state.xIsNext)
     let status
-    switch (calculateWinner (this.state.quadrados)) {
-      case true:
-        status = "Vencendor: " + (!this.state.xIsNext ? 'X' : 'O');
-        if(this.state.gameEnded === false) {
-          this.setState({gameEnded: true});
-        }
-        break;
+    if (calculateWinner (this.state.quadrados)) {
+      status = "Vencendor: " + (!this.state.xIsNext ? 'X' : 'O');
+      //this.state.quadrados.fill(null);
       
-      case 'velha':
-        status = "Deu velha";
-        if(this.state.gameEnded === false) {
-          this.setState({gameEnded: true});
-        }
-        break;
-    
-      default:
-        status = "Jogador: " + (this.state.xIsNext ? 'X' : 'O');
     }
-    // if (calculateWinner (this.state.quadrados)) {
-    //   status = "Vencendor: " + (!this.state.xIsNext ? 'X' : 'O');
-    //   if(this.state.gameEnded === false) {
-    //     this.setState({gameEnded: true});
-    //   }
-    // }
-    // else if (calculateWinner(this.state.quadrados) === 'velha'){
-    //   status = "Deu Velha";
-    // }
-    // else {
-    //    status = "Jogador: " + (this.state.xIsNext ? 'X' : 'O');
-    // }
+    else {
+       status = "Jogador: " + (this.state.xIsNext ? 'X' : 'O');
+    }
     return (
       <div>
         <div className="status">{status}</div>
@@ -91,12 +67,9 @@ class Tabuleiro extends React.Component {
           {this.renderizarQuadrado(7)}
           {this.renderizarQuadrado(8)}
         </div>
-        <div className="menu">
-            <button id="button1" onClick={() => this.resetBoard()}>
-              Restart
-            </button>
-            <button id="button2" onClick={() => this.randomPlay()}>
-              Jogada Aleatoria
+        <div className="reset-button">
+            <button onClick={() => this.resetBoard()}>
+              Reset
             </button>
         </div>
       </div>
@@ -107,30 +80,14 @@ class Tabuleiro extends React.Component {
       const quadrados = this.state.quadrados.slice();
       quadrados.fill(null);
       this.setState({
-        quadrados: quadrados, xIsNext: true, gameEnded: false
+        quadrados: quadrados, xIsNext: true
       });
-    }
-
-    randomPlay() {
-      const quadrados = this.state.quadrados;
-      const player = this.state.xIsNext;
-      if(this.state.gameEnded === true) {
-        return alert('O jogo terminou, clique em restart para jogar novamente!');
-      }
-      let i = checkNextPlay(quadrados, player);
-      while(quadrados[i] !== null) {
-        i = Math.floor(Math.random() * (9 - 0)) + 0;
-      }
-      if (i !== null) {
-        return this.handleClick(i);
-      }
-      
     }
   
     handleClick (i) {
       const quadrados = this.state.quadrados.slice();
       if (quadrados[i]) {
-       alert ("Posição ocupada");
+       alert ("PosiÃ§Ã£o ocupada");
        return; 
       }
       quadrados[i] = this.state.xIsNext ? 'X' : 'O';
@@ -169,35 +126,6 @@ class Jogo extends React.Component {
 // function resetBoard(squares) {
 //   return squares.fill(null);
 // }
-function checkNextPlay(squares,player) {
-  if (player === true) player = 'X';
-  else player = 'O';
-  console.log(player);
-  const lines = [
-    [0,1,2],
-    [3,4,5],
-    [6,7,8],
-    [0,3,6],
-    [1,4,7],
-    [2,5,8],
-    [0,4,8],
-    [2,4,6],
-  ];
-  for (let i = 0; i < lines.length; i++) {
-    const [a,b,c] = lines[i];
-    switch (true) {
-      case (squares[a] !== player && squares[b] !== null && squares[a] === squares[b] && squares[c] === null):
-      return c;
-      case (squares[a] !== player && squares[c] !== null && squares[a] === squares[c] && squares[b] === null):
-        return b;
-      case (squares[b] !== player && squares[c] !== null && squares[b] === squares[c] && squares[a] === null):
-        return a;
-      default:
-        break;
-    }
-  }
-  return null;
-}
 
 function calculateWinner(squares) {
   const lines = [
@@ -213,11 +141,8 @@ function calculateWinner(squares) {
   for (let i = 0; i < lines.length; i++) {
     const [a,b,c] = lines[i];
     if (squares[a] && squares[a] === squares[b] && squares[a] === squares[c]) {
-      return true;
+      return squares[a];
     }
-  }
-  if(squares.every((i) => {return i !== null})) {
-    return 'velha';
   }
   return null;
 }
@@ -250,4 +175,3 @@ ReactDOM.render(
 
 
 //ReactDOM.render(<App />, document.getElementById('root'));
-
